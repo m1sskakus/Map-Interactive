@@ -1,0 +1,77 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&display=swap');
+
+:root {
+  font-family: 'Manrope', 'Segoe UI', sans-serif;
+  color: #29251e;
+  background: #ede5d4;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  color-scheme: light;
+  scroll-behavior: smooth;
+
+  --paper: #ede5d4;
+  --paper-light: #f5efe1;
+  --paper-deep: #d8c9a8;
+  --ink: #29251e;
+  --ink-soft: #665a46;
+  --ink-faint: #91836b;
+  --burgundy: #772e32;
+  --gold: #9a7940;
+  --olive: #64684e;
+  --rule: rgba(74, 60, 40, .28);
+  --serif: 'Cormorant Garamond', 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
+  --sans: 'Manrope', 'Segoe UI', sans-serif;
+  --page-width: 1440px;
+}
+
+* { box-sizing: border-box; }
+html { min-width: 320px; scroll-padding-top: 92px; }
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+  color: var(--ink);
+  background: radial-gradient(ellipse at 11% 10%, rgba(255,255,255,.5), transparent 34rem), radial-gradient(ellipse at 88% 32%, rgba(184,159,112,.09), transparent 42rem), #ede5d4;
+  font-family: var(--sans);
+  font-size: 14px;
+  line-height: 1.65;
+}
+body::before {
+  position: fixed;
+  z-index: -1;
+  inset: 0;
+  content: '';
+  pointer-events: none;
+  opacity: .15;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.84' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.2'/%3E%3C/svg%3E");
+}
+button, a { font: inherit; }
+button { color: inherit; }
+a { color: inherit; }
+button:focus-visible, a:focus-visible { outline: 2px solid var(--burgundy); outline-offset: 4px; }
+::selection { color: #fff8e8; background: var(--burgundy); }
+#root { min-height: 100vh; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}
+:root {
+  --font-body: 17px;
+  --font-secondary: 15px;
+  --font-meta: 13px;
+}
+
+body {
+  font-size: var(--font-body);
+  line-height: 1.62;
+}
+
+@media (max-width: 320px) {
+  html,
+  body {
+    min-width: 0;
+  }
+}

@@ -1,0 +1,102 @@
+import { useEffect, useRef, useState } from 'react'
+import { Link } from 'react-router-dom'
+import './AugsburgPage.css'
+
+const routes = [
+  { id: 'cloth', label: 'Ткани', title: 'От пряжи к дальнему рынку', number: '01', body: 'Хлопок, привозимый через Венецию, соединяли со льном и превращали в бумазею — прочную смесовую ткань. Купеческие компании финансировали производство и сбывали товар далеко за пределами Швабии.', fact: 'ПРОИЗВОДСТВО · ТЕКСТИЛЬ', icon: '✣' },
+  { id: 'metal', label: 'Медь и серебро', title: 'Рудники, металл и капитал', number: '02', body: 'Деловая сеть Фуггеров связывала кредитование горных предприятий с добычей и торговлей медью и серебром в Тироле и Верхней Венгрии. Металл был товаром и источником влияния.', fact: 'СЫРЬЁ · ГОРНОЕ ДЕЛО', icon: '◈' },
+  { id: 'network', label: 'Сеть купцов', title: 'Город внутри европейских маршрутов', number: '03', body: 'Аугсбургские компании работали на северо-южных направлениях между Нидерландами и Италией. Филиалы, агенты и партнёры передавали товары, новости и сведения о ценах.', fact: 'МАРШРУТЫ · ОБМЕН', icon: '⌘' },
+  { id: 'credit', label: 'Кредит', title: 'Доверие записывали на бумаге', number: '04', body: 'Кредит позволял оплачивать крупные поставки и поддерживать правителей до получения доходов. В 1519 году деньги Фуггеров были частью финансовой борьбы за избрание Карла V; конкретные договорённости были сложнее простой «покупки короны».', fact: 'СЧЁТ · ФИНАНСЫ', icon: 'Ⅳ' },
+  { id: 'power', label: 'Политическое влияние', title: 'Богатство входило в зал совета', number: '05', body: 'Связи с Габсбургами, кредит, привилегии и участие в городском управлении переплетались. Но богатство одной семьи не означало равных возможностей для ремесленников и наёмных работников.', fact: 'ВЛИЯНИЕ · ВЛАСТЬ', icon: '⚜' },
+]
+
+const people = [
+  { id: 'banker', role: 'Купец и финансист', title: 'Между конторой и двором', body: 'Утро могло начинаться с писем и сверки счетов: партнёры находились в разных городах, а решения требовали новостей и доверенных посредников. Доступ к кредиту и власти открывал двери, недоступные большинству горожан.', day: 'Счета, корреспонденция, переговоры с партнёрами и представителями власти.', limit: 'Крупные вложения несли риск, а положение семьи зависело от политических решений и устойчивости торговых маршрутов.' },
+  { id: 'weaver', role: 'Ткач или прядильщик', title: 'Работа, встроенная в длинную цепь', body: 'Домашняя работа и мастерская были частью производства, которое связывало город с окрестными поселениями. За готовой тканью стояли пряжа, красители, труд и требования заказчика.', day: 'Подготовка волокна, ткачество или отделка ткани; работа зависела от заказов и материалов.', limit: 'Доход зависел от спроса и условий скупщика. Ремесленная квалификация не давала контроля над всей торговой цепочкой.' },
+  { id: 'trader', role: 'Рыночный торговец', title: 'Цены меняются вместе с новостями', body: 'На рынке встречались местные жители и люди из других земель. Обмен требовал мер, качества товара, знания цен и способности договориться.', day: 'Продажа, проверка товара, поиск поставщиков и расчёты с покупателями.', limit: 'Мелкий торговец имел меньше запасов и связей, чем крупный купец; правила торговли задавал городской совет.' },
+  { id: 'apprentice', role: 'Подмастерье или ученик', title: 'Осваивать ремесло — ждать своего места', body: 'Молодой работник учился у мастера и помогал в повседневной работе. Ремесло могло дать навык и заработок, но путь к самостоятельной мастерской был долгим.', day: 'Подготовка инструментов и материалов, поручения, наблюдение за работой мастера.', limit: 'Низкий статус и зависимость от нанимателя ограничивали выбор и доход; возможности различались по ремеслу и семейным связям.' },
+]
+
+const objects = [
+  { id: 'book', kind: 'book', name: 'Книга счетов', type: 'УЧЁТ · БУМАГА И ЧЕРНИЛА', text: 'Купеческая книга помогала держать в памяти долги, платежи, поставки и доли партнёров. Это реконструкция предметного типа, не подлинная книга Фуггеров.', reveal: 'Дальняя торговля зависела от письма и сопоставимых записей не меньше, чем от товара.' },
+  { id: 'cloth', kind: 'cloth', name: 'Образец бумазеи', type: 'ТЕКСТИЛЬ · ХЛОПОК И ЛЁН', text: 'Бумазея — ткань из хлопка и льна — была важной частью южнонемецкого текстильного производства. Здесь показан условный образец, без претензии на конкретную находку из Аугсбурга.', reveal: 'Городское богатство опиралось на множество этапов труда, включая работу за пределами городских стен.' },
+  { id: 'copper', kind: 'copper', name: 'Медный слиток', type: 'МЕТАЛЛ · ГОРНОЕ ДЕЛО', text: 'Медь из горных районов Центральной Европы проходила через торговые сети крупных компаний. Изображение — условная реконструкция товарного металла.', reveal: 'Сочетание добычи, торговли и кредитования давало влиятельным компаниям контроль над целыми цепями поставок.' },
+  { id: 'coin', kind: 'coin', name: 'Золотой гульден', type: 'ДЕНЬГИ · РАСЧЁТЫ', text: 'Золотые гульдены использовались в крупных расчётах эпохи. Монета на иллюстрации намеренно не копирует конкретный выпуск или атрибутированную находку.', reveal: 'Политический кредит 1519 года связывал городские финансы с выбором нового правителя империи.' },
+]
+
+const places = [
+  { tag: 'ГОРОДСКОЙ СОВЕТ', name: 'Старое Rathaus', body: 'В 1519 году здесь стоял позднеготический комплекс ратуши, перестроенный в 1510–1516 годах. Знаменитое здание Элиаса Холля появится только в XVII веке.' },
+  { tag: 'ГОРОДСКОЙ СИЛУЭТ', name: 'Perlachturm', body: 'Башня у церкви Святого Петра существовала задолго до 1519 года. Её знакомый сегодняшний облик сложился после позднейших перестроек, поэтому здесь она показана ниже и проще.' },
+  { tag: 'ТОРГОВЫЕ УЛИЦЫ', name: 'Рынок и кварталы мастерских', body: 'Торговля и ремесло были рассеяны по улицам города; рынок связывал продавцов, покупателей, приезжих и местных производителей.' },
+  { tag: 'КУПЕЧЕСКИЙ ДОМ', name: 'Дома Фуггеров', body: 'Семья начала строить резиденции на нынешней Максимилианштрассе в 1512–1515 годах. Это современная улица и ансамбль более поздних изменений, а не точная сцена 1519 года.' },
+]
+
+function AugsburgArtwork() {
+  return <svg className="augsburg-artwork" viewBox="0 0 900 600" role="img" aria-labelledby="aug-art-title aug-art-desc">
+    <title id="aug-art-title">Художественная реконструкция Аугсбурга около 1519 года</title><desc id="aug-art-desc">Городские крыши, шпили, старая ратуша и башня Перлах на фоне холмов. Это стилизованная, не точная реконструкция.</desc>
+    <defs><linearGradient id="aug-sky" x2="0" y2="1"><stop stopColor="#d6c9a9"/><stop offset="1" stopColor="#eee2c4"/></linearGradient><pattern id="aug-grain" width="70" height="70" patternUnits="userSpaceOnUse"><circle cx="11" cy="16" r="1" fill="#57462d" opacity=".2"/><circle cx="52" cy="44" r=".8" fill="#57462d" opacity=".17"/><path d="M24 58h12" stroke="#6c5334" opacity=".14"/></pattern></defs>
+    <rect width="900" height="600" fill="url(#aug-sky)"/><path d="M0 327 Q110 252 212 300T430 279T660 295T900 250V600H0Z" fill="#9a9675" opacity=".45"/><path d="M0 377Q150 300 296 353T580 330T900 354V600H0Z" fill="#687561" opacity=".55"/>
+    <path d="M0 465 56 432l48 26 48-70 44 37 58-76 43 60 44-29 56 54 44-97 56 48 38-37 44 49 52-73 58 44 45-32 64 47v217H0Z" fill="#78694f" stroke="#514b39" strokeWidth="3"/>
+    <g fill="#c1a878" stroke="#584a37" strokeWidth="3"><path d="M65 450v-71l43-33 44 33v71Zm90-4v-95l48-35 52 35v95Zm109 9v-81l43-31 45 31v81Zm98-7v-102l54-39 54 39v102Zm121 7v-78l47-34 48 34v78Zm106-7v-108l58-42 55 42v108Zm123 4v-87l48-36 53 36v87Z"/></g>
+    <g stroke="#574735" strokeWidth="2" fill="#eee0bf"><path d="M73 379l35-29 37 29m-36-29v-42l12-17 12 17v43M168 351l35-27 40 27m-24-27v-47l10-13 10 13v48M503 376l42-32 44 32m-44-32v-56l11-16 12 16v56M624 351l48-35 45 35m-58-35v-52l12-16 12 16v54"/></g>
+    <g><path d="M369 457V352l43-34 44 34v105Z" fill="#a87c4b" stroke="#453c30" strokeWidth="4"/><path d="M357 353l55-48 57 48" fill="#594738" stroke="#453c30" strokeWidth="4"/><path d="M389 400h18v35h-18zm36-1h18v36h-18z" fill="#574639"/><path d="M412 320v-35m-7 0h14m-10-8 3-11 4 11" stroke="#453c30" strokeWidth="4"/></g>
+    <g><path d="M741 450V252h39V450Z" fill="#ac9670" stroke="#453c30" strokeWidth="4"/><path d="M733 253h55l-27-45Z" fill="#725443" stroke="#453c30" strokeWidth="4"/><path d="M752 305h17v28h-17zm0 49h17v28h-17z" fill="#554535"/><path d="M760 204v-37m-10 0h20m-10-7 4-10 4 10" stroke="#453c30" strokeWidth="4"/></g>
+    <path d="M0 459Q100 441 202 460t207-2 204 7 177-8 110 4v139H0Z" fill="#ae9b73" stroke="#554939" strokeWidth="4"/><path d="M36 503h822M57 537h786" stroke="#6f6048" opacity=".52" strokeWidth="2"/><path d="M0 0h900v600H0z" fill="url(#aug-grain)"/><path d="M20 20h860v560H20z" fill="none" stroke="#4c3c2c" strokeWidth="5"/><path d="M31 31h838v538H31z" fill="none" stroke="#987644" strokeWidth="1.5"/>
+    <text x="48" y="72" className="aug-art-label">AVGVSTA · 1519</text><text x="50" y="96" className="aug-art-small">RECONSTRUCTIO ARTISTICA</text>
+  </svg>
+}
+
+function NetworkDiagram({ selected, onSelect }) {
+  const nodes = [{ id: 'cloth', x: 16, y: 34 }, { id: 'metal', x: 16, y: 68 }, { id: 'network', x: 50, y: 50 }, { id: 'credit', x: 82, y: 34 }, { id: 'power', x: 82, y: 68 }]
+  return <div className="trade-network" aria-label="Интерактивная схема торговых связей">
+    <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path d="M16 34 50 50M16 68 50 50M50 50 82 34M50 50 82 68M16 34 82 34M16 68 82 68"/><path d="M18 34h30m5 16h26M18 68h30" className="network-dash"/></svg>
+    {nodes.map((node) => { const item = routes.find((route) => route.id === node.id); return <button type="button" key={node.id} className={'trade-node node-' + node.id + (selected === node.id ? ' is-active' : '')} style={{ left: node.x + '%', top: node.y + '%' }} onClick={() => onSelect(node.id)} aria-pressed={selected === node.id}><span>{item.icon}</span><strong>{item.label}</strong></button> })}
+  </div>
+}
+
+function AugsburgPage() {
+  const [selectedRoute, setSelectedRoute] = useState('cloth')
+  const [selectedPerson, setSelectedPerson] = useState(people[0].id)
+  const [selectedObject, setSelectedObject] = useState(null)
+  const dialogRef = useRef(null)
+  const closeRef = useRef(null)
+  const route = routes.find((item) => item.id === selectedRoute)
+  const person = people.find((item) => item.id === selectedPerson)
+
+  useEffect(() => {
+    const dialog = dialogRef.current
+    if (!selectedObject || !dialog) return undefined
+    if (!dialog.open) dialog.showModal()
+    closeRef.current?.focus()
+    return () => {
+      if (dialog.open) dialog.close()
+    }
+  }, [selectedObject])
+
+  function closeObjectDialog() {
+    if (dialogRef.current?.open) dialogRef.current.close()
+    setSelectedObject(null)
+  }
+
+  return <main className="augsburg-page">
+    <div className="aug-topline page-wrap"><Link to="/#atlas" className="back-to-atlas"><span aria-hidden="true">←</span> Назад к атласу</Link><span>ГЛАВА 04 <i>/</i> АУГСБУРГ</span><span>1519 · ШВАБИЯ</span></div>
+    <section className="aug-hero" aria-labelledby="aug-title"><div className="aug-hero-inner page-wrap"><div className="aug-hero-copy"><p className="eyebrow">AVGVSTA VINDELICORVM · 1519</p><h1 id="aug-title">Аугсбург</h1><p className="aug-subtitle">Торговля, богатство<br/>и влияние</p><p className="aug-intro">Город купцов, мастерских и дальних связей. Здесь деньги и товары двигались между Альпами, итальянскими рынками и дворами Европы — и могли менять судьбу империи.</p><a className="aug-explore" href="#aug-story">Начать исследование <span aria-hidden="true">↓</span></a><p className="aug-thesis">ДЕНЬГИ МОГЛИ ПОВЛИЯТЬ<br/>НА СУДЬБУ ИМПЕРИИ</p></div><figure className="aug-hero-art"><AugsburgArtwork/><figcaption>Художественная реконструкция по мотивам раннего Нового времени · не точный вид 1519 года</figcaption></figure><div className="aug-date-stamp"><small>IMPERIVM</small><strong>15</strong><span>19</span><i>AVGVSTA</i></div></div></section>
+
+    <section className="aug-story page-wrap" id="aug-story"><div className="aug-story-intro"><p className="eyebrow"><span>I</span> MERCATVRA · FIDES · POTENTIA</p><h2>Город, где капитал<br/><em>становился влиянием</em></h2><p>К началу XVI века Аугсбург стал одним из главных центров дальней торговли южной Германии. Купеческие компании связывали производство, добычу сырья, перевозку и кредит.</p><p>Семья Фуггеров выросла из текстильной торговли и расширила дела в горное дело и финансы. Якоб Фуггер поддерживал связи с Габсбургами; в 1519 году финансовая помощь его компании была связана с борьбой за избрание Карла.</p><a className="aug-inline-source" href="https://www.fugger.de/geschichte/jakob-fugger-faq-historiker-antworten" target="_blank" rel="noreferrer">Историки о Фуггерах и выборах 1519 года ↗</a></div><div className="aug-story-aside"><div className="aug-aside-number">01<span> / 05</span></div><p>Не один товар и не одна семья создавали богатство. За купеческой сетью стояли мастера, работники, перевозчики и городские правила.</p><div className="aug-thread" aria-hidden="true"><i/><i/><i/><i/><i/></div><small>ГОРОДСКАЯ ЭКОНОМИКА · 1519</small></div></section>
+
+    <section className="aug-network-section"><div className="page-wrap"><div className="aug-section-head"><div><p className="eyebrow"><span>II</span> ITER PECVNIAE</p><h2>Проследить путь<br/><em>товара и денег</em></h2></div><p>Выберите звено сети. Схема показывает общую логику торговли и кредита, а не конкретную документированную сделку.</p></div><div className="network-layout"><NetworkDiagram selected={selectedRoute} onSelect={setSelectedRoute}/><article className="route-detail" key={route.id}><span>{route.number} · {route.fact}</span><h3>{route.title}</h3><p>{route.body}</p><div className="route-flow"><i>сырьё</i><b>→</b><i>производство</i><b>→</b><i>рынок / кредит</i></div></article></div><div className="network-legend"><span><i className="legend-cloth"/> товары и работа</span><span><i className="legend-credit"/> капитал и влияние</span></div></div></section>
+
+    <section className="aug-social page-wrap"><div className="aug-section-head"><div><p className="eyebrow"><span>III</span> VITAE CIVITATIS</p><h2>Четыре жизни<br/><em>одного города</em></h2></div><p>Выберите человека. Это исторически обоснованные собирательные образы, не документированные биографии и не подлинные цитаты.</p></div><div className="social-explorer"><div className="social-tabs" role="tablist" aria-label="Выбрать социальную перспективу">{people.map((item,index)=><button type="button" role="tab" id={'aug-person-tab-'+item.id} aria-selected={selectedPerson===item.id} aria-controls="aug-person-panel" key={item.id} onClick={()=>setSelectedPerson(item.id)}><span>0{index+1}</span><strong>{item.role}</strong></button>)}</div><article className="social-panel" id="aug-person-panel" role="tabpanel" aria-labelledby={'aug-person-tab-'+person.id} key={person.id}><p className="reconstruction-note">✳ ИЛЛЮСТРАТИВНАЯ ИСТОРИЧЕСКАЯ ПЕРСПЕКТИВА</p><h3>{person.title}</h3><p className="social-body">{person.body}</p><div className="social-columns"><div><span>ВОЗМОЖНЫЙ РИТМ ДНЯ</span><p>{person.day}</p></div><div><span>ВОЗМОЖНОСТИ И ГРАНИЦЫ</span><p>{person.limit}</p></div></div></article></div></section>
+
+    <section className="aug-objects"><div className="page-wrap"><div className="aug-section-head"><div><p className="eyebrow"><span>IV</span> RES MERCATORIAE</p><h2>Вещи, за которыми<br/><em>стоит целая сеть</em></h2></div><p>Откройте предмет: иллюстрации показывают типы вещей, а не конкретные находки, атрибутированные Аугсбургу.</p></div><div className="aug-object-grid">{objects.map((item,index)=><button type="button" className={'aug-object object-'+item.kind} key={item.id} onClick={()=>setSelectedObject(item)} aria-haspopup="dialog"><span className="object-no">0{index+1}</span><svg viewBox="0 0 180 130" aria-hidden="true">{item.kind==='book'&&<g><path d="m43 28 55-13 38 19-5 72-60 11-29-19z"/><path d="m43 28 28 17 60-11M71 45v72m14-64 39-8m-38 21 33-7m-32 18 32-7"/></g>}{item.kind==='cloth'&&<g><path d="m49 28 75-7 14 77-72 19z"/><path d="m57 37 68-6m-65 16 67-6m-63 17 66-6m-62 18 66-6m-61 18 65-6M68 30l14 80m17-82 13 78"/></g>}{item.kind==='copper'&&<g><path d="m42 79 19-47 69 4 12 47-19 20-68-4z"/><path d="m42 79 68 7 32-3M61 32l49 54m20-50-20 50"/></g>}{item.kind==='coin'&&<g><circle cx="90" cy="65" r="45"/><circle cx="90" cy="65" r="36"/><path d="M90 39v53m-11-42c13-10 28 3 14 12l-12 6c-14 9 2 26 18 13M70 65h40"/></g>}</svg><strong>{item.name}</strong><span className="object-open">Рассмотреть предмет ↗</span></button>)}</div><p className="objects-note">Стилизованные иллюстрации предметных типов · не факсимиле исторических находок.</p></div></section>
+
+    <section className="aug-places page-wrap"><div className="aug-section-head"><div><p className="eyebrow"><span>V</span> LOCI AVGVSTAE</p><h2>Городская ткань<br/><em>и её ориентиры</em></h2></div><p>Аугсбург 1519 года — не современная открытка. Поздние силуэты отмечены как изменения, произошедшие после выбранной эпохи.</p></div><div className="aug-place-list">{places.map((item,index)=><article key={item.name}><span className="aug-place-number">0{index+1}</span><div><small>{item.tag}</small><h3>{item.name}</h3><p>{item.body}</p></div><span className="place-mark" aria-hidden="true">✣</span></article>)}</div></section>
+
+    <section className="aug-sources"><div className="page-wrap aug-sources-inner"><div><p className="eyebrow">APPARATVS FONTIVM</p><h2>Источники<br/>и оговорки</h2><p>Исторические факты отделены от иллюстративных реконструкций. Сумма и роль кредитов в выборах 1519 года остаются предметом трактовки источников.</p></div><ol><li><a href="https://www.historisches-lexikon-bayerns.de/Lexikon/Handelsgesellschaften_(15._bis_17._Jahrhundert)" target="_blank" rel="noreferrer">Historisches Lexikon Bayerns · торговые компании ↗</a><span>Ткани, связи между Нидерландами и Италией, сырьё и производство.</span></li><li><a href="https://www.fugger.de/geschichte/jakob-fugger-faq-historiker-antworten" target="_blank" rel="noreferrer">Fugger.de · Якоб Фуггер и выборы Карла V ↗</a><span>Пояснение историков о выборах 1519 года и финансовых обещаниях.</span></li><li><a href="https://www.fugger.de/en/history/history-of-the-fugger-family-since-1367" target="_blank" rel="noreferrer">Fugger.de · хронология семьи ↗</a><span>Фуггерские дома, деловые изменения и основание Фуггерая в 1521 году.</span></li><li><a href="https://www.augsburg.de/kultur/stadtarchiv-augsburg/digitale-praesentationen/das-historische-dokument/aeltere-historische-dokumente/nachricht-an-die-nachkommen" target="_blank" rel="noreferrer">Stadtarchiv Augsburg · старое Rathaus ↗</a><span>Перестройки ратуши в 1510–1516 годах и городской контекст.</span></li><li><a href="https://www.augsburg.de/kultur/sehenswuerdigkeiten/perlachturm/perlachturm-das-wahrzeichen" target="_blank" rel="noreferrer">Stadt Augsburg · Perlachturm ↗</a><span>История башни и более поздние этапы её современного облика.</span></li><li><a href="https://www.dhm.de/mediathek/en/ida0/timeline/frankfurt-en/" target="_blank" rel="noreferrer">Deutsches Historisches Museum · выборы 1519 года ↗</a><span>Контекст кампании и финансирования избрания Карла.</span></li></ol></div></section>
+    <div className="aug-return page-wrap"><Link to="/#atlas">← Вернуться к атласу</Link><span>AVGVSTA VINDELICORVM · 1519</span></div>
+
+    <dialog ref={dialogRef} className="aug-object-dialog" onCancel={(event)=>{event.preventDefault();closeObjectDialog()}} onClose={()=>setSelectedObject(null)} onClick={(event)=>{if(event.target===event.currentTarget)closeObjectDialog()}} aria-labelledby="aug-object-title">{selectedObject&&<div className="aug-dialog-inner"><button ref={closeRef} type="button" className="aug-dialog-close" onClick={closeObjectDialog} aria-label="Закрыть">×</button><div className={'aug-dialog-illustration object-'+selectedObject.kind}><span>✣</span></div><div><p className="eyebrow">{selectedObject.type}</p><h2 id="aug-object-title">{selectedObject.name}</h2><p>{selectedObject.text}</p><div className="object-reveals"><small>ЧТО ЭТО ОТКРЫВАЕТ</small><p>{selectedObject.reveal}</p></div><button className="aug-dialog-done" type="button" onClick={closeObjectDialog}>Вернуться к предметам</button></div></div>}</dialog>
+  </main>
+}
+
+export default AugsburgPage
